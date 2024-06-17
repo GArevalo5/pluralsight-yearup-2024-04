@@ -8,6 +8,12 @@
    http://www.springframework.org/schema/context
    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+    <bean id="actor1" class="com.pluralsight.models.Actor">
+        <property name="actorId" value="15"/>
+        <property name="firstName" value="John"/>
+        <property name="lastName" value="Doe" />
+    </bean>
+
     <bean class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="url" value="jdbc:mysql://localhost:3306/sakila "/>
         <property name="username" value="root"/>
