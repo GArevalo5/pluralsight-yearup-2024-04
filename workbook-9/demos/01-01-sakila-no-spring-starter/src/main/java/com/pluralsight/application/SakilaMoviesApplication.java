@@ -8,9 +8,9 @@ import java.util.List;
 
 public class SakilaMoviesApplication
 {
-    private final ApplicationConfiguration config;
+    private final iocContainer config;
 
-    public SakilaMoviesApplication(ApplicationConfiguration config)
+    public SakilaMoviesApplication(iocContainer config)
     {
         this.config = config;
     }
