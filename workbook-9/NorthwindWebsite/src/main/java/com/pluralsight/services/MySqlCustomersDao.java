@@ -63,6 +63,119 @@ public class MySqlCustomersDao implements CustomersDao
         return customers;
     }
 
+    @Override
+    public Customer getCustomerById(String customerId) {
+        List<Customer> customers = new ArrayList<>();
+
+        try(Connection con = dataSource.getConnection())
+        {
+            String sql = """
+                    SELECT CustomerId
+                        , CompanyName
+                        , ContactName
+                        , Address
+                        , City
+                        , Region AS State
+                        , PostalCode as Zip
+                        , Country
+                    FROM customers
+                    WHERE customerId = ?
+                    """;
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, customerId);
+
+            ResultSet row = statement.executeQuery();
+
+            if(row.next())
+            {
+                Customer customer = mapRowToCustomer(row);
+                return customer;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    @Override
+    public Customer addCustomer(Customer customer) {
+
+        try(Connection connection = dataSource.getConnection())
+        {
+            String sql = """
+                    INSERT INTO customers (CustomerId, CompanyName, ContactName, Address, City, Region, PostalCode, Country)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                    """;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, customer.getCustomerId());
+            statement.setString(2, customer.getCompanyName());
+            statement.setString(3, customer.getContactName());
+            statement.setString(4, customer.getAddress());
+            statement.setString(5, customer.getCity());
+            statement.setString(6, customer.getState());
+            statement.setString(7, customer.getZip());
+            statement.setString(8, customer.getCountry());
+
+            statement.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+        }
+
+        return getCustomerById(customer.getCustomerId());
+    }
+
+    @Override
+    public void updateCustomer(String customerId, Customer customer) {
+
+        try(Connection connection = dataSource.getConnection())
+        {
+            String sql = """
+                    UPDATE Customers
+                    SET CompanyName = ?
+                        , ContactName = ?
+                        , Address = ?
+                        , City = ?
+                        , Region = ?
+                        , PostalCode = ?
+                        , Country = ?
+                    WHERE CustomerId = ?
+                    """;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, customer.getCompanyName());
+            statement.setString(2, customer.getContactName());
+            statement.setString(3, customer.getAddress());
+            statement.setString(4, customer.getCity());
+            statement.setString(5, customer.getState());
+            statement.setString(6, customer.getZip());
+            statement.setString(7, customer.getCountry());
+            statement.setString(8, customerId);
+
+            statement.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+        }
+    }
+
+    @Override
+    public void deleteCustomer(String customerId) {
+        try(Connection connection = dataSource.getConnection())
+        {
+            String sql = "DELETE FROM Customers WHERE CustomerId = ?;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, customerId);
+
+            statement.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+        }
+    }
+
     public Customer mapRowToCustomer(ResultSet row) throws SQLException
     {
 

@@ -92,6 +92,101 @@ public class MySqlProductsDao implements ProductsDao {
         return null;
     }
 
+    @Override
+    public Product addProduct(Product product) {
+
+        try(Connection connection = dataSource.getConnection()) {
+            String sql = """
+                    INSERT INTO products
+                    ( ProductID
+                    , ProductName
+                    ,SupplierID
+                    ,CategoryID
+                    ,QuantityPerUnit
+                    ,UnitPrice
+                    ,UnitsInStock
+                    ,UnitsOnOrder
+                    ,ReorderLevel
+                    ,Discontinued)
+                    VALUES(?,?,?,?,?,?,?,?,?,?);
+                    """;
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setInt(1,product.getProductId());
+            statement.setString(2, product.getProductName());
+            statement.setInt(3, product.getSupplierId());
+            statement.setInt(4,product.getCategoryId());
+            statement.setString(5, product.getQuantityPerUnit());
+            statement.setDouble(6, product.getUnitPrice());
+            statement.setInt(7,product.getUnitsInStock());
+            statement.setInt(8,product.getUnitsOnOrder());
+            statement.setInt(9,product.getDiscontinued());
+
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return getById(product.getProductId());
+    }
+
+    @Override
+    public void updateProduct(int productId, Product product)
+    {
+        try(Connection connection = dataSource.getConnection()) {
+            String sql = """
+                    UPDATE products
+                    SET ProductName = ?
+                    , SupplierID = ?
+                    , CategoryID = ?
+                    , QuantityPerUnit = ?
+                    , UnitPrice = ?
+                    , UnitsInStock = ?
+                    , UnitsOnOrder = ?
+                    , ReorderLevel = ?
+                    , Discontinued = ?
+                    WHERE ProductID = ?
+                    """;
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, product.getProductName());
+            statement.setInt(2, product.getSupplierId());
+            statement.setInt(3,product.getCategoryId());
+            statement.setString(4, product.getQuantityPerUnit());
+            statement.setDouble(5, product.getUnitPrice());
+            statement.setInt(6,product.getUnitsInStock());
+            statement.setInt(7,product.getUnitsOnOrder());
+            statement.setInt(8,product.getDiscontinued());
+            statement.setInt(9,product.getProductId());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public void deleteProduct(int productId)
+    {
+        try(Connection connection = dataSource.getConnection()){
+            String sql = """
+                    DELETE
+                    FROM products
+                    WHERE ProductID = ?;
+                    """;
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1,productId);
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Product mapRowsToProducts(ResultSet row) throws SQLException
     {
         int productId = row.getInt("ProductID");

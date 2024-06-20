@@ -3,9 +3,7 @@ package com.pluralsight.controllers;
 import com.pluralsight.models.Customer;
 import com.pluralsight.services.CustomersDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,5 +22,30 @@ public class CustomersController
     public List<Customer> search(@RequestParam(defaultValue = "", name = "name") String companyName,@RequestParam(defaultValue = "") String country)
     {
         return customersDao.searchCustomers(companyName, country);
+    }
+
+    @GetMapping("/customers/{customerId}")
+    public Customer getCustomerById(@PathVariable String customerId)
+    {
+        return customersDao.getCustomerById(customerId);
+    }
+
+    @PostMapping("/customers")
+    public Customer addCustomer(@RequestBody Customer customer)
+    {
+        var newCustomer = customersDao.addCustomer(customer);
+        return newCustomer;
+    }
+
+    @PutMapping("/customers/{customerId}")
+    public void updateCustomer(@PathVariable String customerId, @RequestBody Customer customer)
+    {
+        customersDao.updateCustomer(customerId, customer);
+    }
+
+    @DeleteMapping("/customers/{customerId}")
+    public void deleteCustomer(@PathVariable String customerId)
+    {
+        customersDao.deleteCustomer(customerId);
     }
 }
