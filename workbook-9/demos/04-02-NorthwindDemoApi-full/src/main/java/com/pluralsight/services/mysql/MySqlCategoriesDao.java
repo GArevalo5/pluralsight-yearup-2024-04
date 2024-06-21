@@ -104,8 +104,6 @@ public class MySqlCategoriesDao implements CategoriesDao
             ResultSet generatedKeys = statement.getGeneratedKeys();
             generatedKeys.next();
             newId = generatedKeys.getInt(1);
-
-
         }
         catch (SQLException e)
         {
@@ -139,10 +137,20 @@ public class MySqlCategoriesDao implements CategoriesDao
     }
 
     @Override
-    public void delete(int categoryId)
+    public void delete(int categoryId) throws SQLException
     {
         try(Connection connection = dataSource.getConnection())
         {
+            String sqlProducts = """
+                    UPDATE products 
+                    SET CategoryId = NULL
+                    WHERE CategoryId = ?;
+                    """;
+            PreparedStatement statementProducts = connection.prepareStatement(sqlProducts);
+            statementProducts.setInt(1, categoryId);
+            statementProducts.executeUpdate();
+
+
             String sql = """
                     DELETE FROM categories
                     WHERE categoryId = ?;
@@ -154,6 +162,7 @@ public class MySqlCategoriesDao implements CategoriesDao
         }
         catch (SQLException e)
         {
+            throw e;
         }
     }
 

@@ -8,11 +8,14 @@ import com.pluralsight.services.CategoriesDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
+@CrossOrigin
 public class CategoriesController
 {
     private CategoriesDao categoriesDao;
@@ -49,10 +52,17 @@ public class CategoriesController
         categoriesDao.update(id, category);
     }
 
-    @DeleteMapping
+    @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id)
     {
-        categoriesDao.delete(id);
+        try
+        {
+            categoriesDao.delete(id);
+        }
+        catch (SQLException e)
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot delete a category that has products.");
+        }
     }
 }
